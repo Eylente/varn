@@ -33,7 +33,7 @@
                                        VerticalAlignment="Bottom" Opacity="0.8" />
                         </StackPanel>
 
-                        <TextBlock Text="© 2026 Balenion" FontSize="11" Foreground="White" Opacity="0.4"
+                        <TextBlock Text="© 2026 Eylente" FontSize="11" Foreground="White" Opacity="0.4"
                                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,40,0" />
 
                         <Button Style="{StaticResource MaterialDesignIconButton}" Width="32" Height="32"
@@ -154,9 +154,9 @@
                                 <materialDesign:PackIcon Kind="Github" Width="16" Height="16" Foreground="White"
                                                          Opacity="0.5" VerticalAlignment="Center" />
                                 <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" FontSize="11">
-                                    <Hyperlink Foreground="{StaticResource MaterialDesign.Brush.Primary}" NavigateUri="https://github.com/Balenion/basalt"
+                                    <Hyperlink Foreground="{StaticResource MaterialDesign.Brush.Primary}" NavigateUri="https://github.com/Eylente/basalt"
                                                RequestNavigate="Hyperlink_RequestNavigate">
-                                        github.com/Balenion/basalt
+                                        github.com/Eylente/basalt
                                     </Hyperlink>
                                 </TextBlock>
                             </StackPanel>
