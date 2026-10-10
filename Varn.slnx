@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Varn.Core.Tests/Varn.Core.Tests.csproj"/>
+  <Project Path="Varn.Core/Varn.Core.csproj" />
+  <Project Path="Varn.UI/Varn.UI.csproj" />
+</Solution>

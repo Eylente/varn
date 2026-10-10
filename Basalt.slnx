@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="Basalt.Core.Tests/Basalt.Core.Tests.csproj" Id="7cff2b19-b886-423a-84fc-6a9bfed900f6" />
-  <Project Path="Basalt.Core/Basalt.Core.csproj" />
-  <Project Path="Basalt.UI/Basalt.UI.csproj" />
-</Solution>
