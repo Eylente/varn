@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Varn.Desktop.Controls"
+			 xmlns:vm="using:Varn.Desktop.ViewModels"
+			 xmlns:views="using:Varn.Desktop.Views"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="900"
+             x:Class="Varn.Desktop.Views.HashView"
+             x:DataType="vm:HashViewModel">
+	<Design.DataContext>
+		<vm:HashViewModel />
+	</Design.DataContext>
+
+	<ScrollViewer>
+		<StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+			<StackPanel Spacing="6">
+				<TextBlock Classes="h1" Text="{loc:T Hash_Title}" />
+				<TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Hash_Subtitle}" />
+			</StackPanel>
+
+			<Border Classes="card">
+				<StackPanel Spacing="14">
+					<TextBlock Classes="label" Text="{loc:T Hash_Password}" />
+					<Grid ColumnDefinitions="*,Auto">
+						<TextBox Classes="mono"
+                                 Text="{Binding Password}"
+                                 PasswordChar="{Binding PasswordChar}" />
+						<ToggleButton Grid.Column="1" Margin="8,0,0,0"
+						              IsChecked="{Binding RevealPassword}"
+						              ToolTip.Tip="{loc:T Hash_Show}">
+							<Panel>
+								<PathIcon Width="18" Height="18" Data="{StaticResource IconEye}"
+								          IsVisible="{Binding !RevealPassword}" />
+								<PathIcon Width="18" Height="18" Data="{StaticResource IconEyeOff}"
+								          IsVisible="{Binding RevealPassword}" />
+							</Panel>
+						</ToggleButton>
+					</Grid>
+				</StackPanel>
+			</Border>
+
+			<views:HashSettingsView DataContext="{Binding Settings}" />
+
+			<StackPanel Orientation="Horizontal" Spacing="12">
+				<controls:IconButton Classes="primary" Icon="{StaticResource IconFlash}" Text="{loc:T Hash_Generate}" Command="{Binding GenerateCommand}" />
+				<controls:IconButton Classes="ghost" Icon="{StaticResource IconClear}" Text="{loc:T Hash_Clear}" Command="{Binding ClearCommand}" />
+			</StackPanel>
+			<ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+			<TextBlock Classes="error" TextWrapping="Wrap" IsVisible="{Binding HasError}"
+                       Text="{Binding ErrorMessage}" />
+
+			<Border Classes="card" IsVisible="{Binding HasResult}">
+				<StackPanel Spacing="12">
+					<TextBlock Classes="label" Text="{loc:T Hash_Result}" />
+					<TextBlock Classes="muted" Text="{Binding ResultAlgorithm}" />
+
+					<TextBlock Classes="label" Text="{loc:T Hash_Hash}" />
+					<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                             Text="{Binding ResultHash, Mode=OneWay}" />
+					<controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                            Click="CopyHash_Click" />
+
+					<StackPanel Spacing="8" IsVisible="{Binding HasSalt}">
+						<TextBlock Classes="label" Text="{loc:T Hash_Salt}" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding ResultSalt, Mode=OneWay}" />
+						<controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                Click="CopySalt_Click" />
+					</StackPanel>
+
+					<StackPanel Spacing="8" IsVisible="{Binding HasParameters}">
+						<TextBlock Classes="label" Text="{loc:T Hash_Parameters}" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding ResultParameters, Mode=OneWay}" />
+					</StackPanel>
+
+					<TextBlock Classes="muted" TextWrapping="Wrap" IsVisible="{Binding SaltEmbedded}"
+                               Text="{loc:T Hash_SaltEmbedded}" />
+					<TextBlock Classes="warn" TextWrapping="Wrap" IsVisible="{Binding HasWarning}"
+                               Text="{Binding Warning}" />
+					<TextBlock Classes="muted" FontSize="11" Text="{loc:T Hash_CopyNote}" />
+				</StackPanel>
+			</Border>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>

@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:views="using:Varn.Desktop.Views"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="900"
+             x:Class="Varn.Desktop.Views.ExcelView"
+             x:DataType="vm:ExcelViewModel">
+	<Design.DataContext>
+		<vm:ExcelViewModel />
+	</Design.DataContext>
+
+	<ScrollViewer>
+		<StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+			<StackPanel Spacing="6">
+				<TextBlock Classes="h1" Text="{loc:T Excel_Title}" />
+				<TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Excel_Subtitle}" />
+			</StackPanel>
+
+			<Border Classes="card">
+				<StackPanel Spacing="12">
+					<TextBlock Classes="label" Text="{loc:T Excel_Step1}" />
+					<TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Excel_TemplateHint}" />
+					<controls:IconButton Classes="ghost" HorizontalAlignment="Left"
+                            Icon="{StaticResource IconDownload}" Text="{loc:T Excel_Template}" Click="Template_Click" />
+				</StackPanel>
+			</Border>
+
+			<Border Classes="card">
+				<StackPanel Spacing="12">
+					<TextBlock Classes="label" Text="{loc:T Excel_Step2}" />
+					<controls:IconButton Classes="ghost" HorizontalAlignment="Left"
+                            Icon="{StaticResource IconFolder}" Text="{loc:T Excel_Choose}" Click="PickInput_Click" />
+					<TextBlock Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasInput}"
+                               Text="{Binding InputPath}" />
+					<TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding InputStatus}"
+                               IsVisible="{Binding !IsInputInvalid}" />
+					<TextBlock Classes="error" TextWrapping="Wrap" Text="{Binding InputStatus}"
+                               IsVisible="{Binding IsInputInvalid}" />
+				</StackPanel>
+			</Border>
+
+			<views:HashSettingsView DataContext="{Binding Settings}" />
+
+			<StackPanel Orientation="Horizontal" Spacing="12">
+				<controls:IconButton Classes="primary" Icon="{StaticResource IconPlay}" Text="{loc:T Excel_Run}"
+                        IsEnabled="{Binding CanRun}" Click="Run_Click" />
+				<controls:IconButton Classes="ghost" Icon="{StaticResource IconClose}" Text="{loc:T Excel_Cancel}"
+                        IsVisible="{Binding IsBusy}" Command="{Binding CancelCommand}" />
+			</StackPanel>
+
+			<ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}"
+                         IsVisible="{Binding IsBusy}" />
+
+			<TextBlock Classes="error" TextWrapping="Wrap" IsVisible="{Binding HasError}"
+                       Text="{Binding ErrorMessage}" />
+
+			<Border Classes="card" IsVisible="{Binding HasSummary}">
+				<StackPanel Spacing="8">
+					<TextBlock Classes="label" Text="{loc:T Hash_Result}" />
+					<TextBlock TextWrapping="Wrap" Text="{Binding SummaryText}" />
+					<TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                               Text="{loc:T Excel_OutputNote}" />
+				</StackPanel>
+			</Border>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>

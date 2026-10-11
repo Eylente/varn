@@ -1,0 +1,142 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="1200"
+             x:Class="Varn.Desktop.Views.TotpView"
+             x:DataType="vm:TotpViewModel">
+    <Design.DataContext>
+        <vm:TotpViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="h1" Text="{loc:T Totp_Title}" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Totp_Subtitle}" />
+            </StackPanel>
+
+            <!-- Секрет и параметры -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T Totp_Secret}" />
+                    <TextBox Classes="mono" Text="{Binding Secret}" />
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{loc:T Totp_SecretHint}" />
+                    <TextBlock Classes="error" TextWrapping="Wrap" IsVisible="{Binding HasSecretError}"
+                               Text="{loc:T Totp_SecretInvalid}" />
+                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconRefresh}" Text="{loc:T Totp_GenerateSecret}"
+                            Command="{Binding GenerateSecretCommand}" />
+
+                    <TextBlock Classes="label" Margin="0,10,0,0" Text="{loc:T Totp_Params}" />
+                    <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                        <TextBlock VerticalAlignment="Center" Text="{loc:T Totp_Digits}" />
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                  SelectedIndex="{Binding DigitsIndex}">
+                            <ComboBoxItem Content="6" />
+                            <ComboBoxItem Content="7" />
+                            <ComboBoxItem Content="8" />
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="{loc:T Totp_Period}" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch"
+                                  SelectedIndex="{Binding PeriodIndex}">
+                            <ComboBoxItem Content="15" />
+                            <ComboBoxItem Content="30" />
+                            <ComboBoxItem Content="60" />
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" Text="{loc:T Totp_Algorithm}" />
+                        <ComboBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch"
+                                  SelectedIndex="{Binding AlgorithmIndex}">
+                            <ComboBoxItem Content="SHA-1" />
+                            <ComboBoxItem Content="SHA-256" />
+                            <ComboBoxItem Content="SHA-512" />
+                        </ComboBox>
+                    </Grid>
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{loc:T Totp_ParamsNote}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Текущий код -->
+            <Border Classes="card" IsVisible="{Binding HasCode}">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T Totp_Current}" />
+                    <TextBlock Classes="code" Text="{Binding CurrentCode}" />
+                    <ProgressBar Minimum="0" Maximum="{Binding PeriodSeconds}" Value="{Binding RemainingSeconds}" />
+                    <TextBlock Classes="muted" Text="{Binding RemainingText}" />
+
+                    <Grid ColumnDefinitions="*,*" Margin="0,6,0,0">
+                        <StackPanel Spacing="2">
+                            <TextBlock Classes="label" Text="{loc:T Totp_Previous}" />
+                            <TextBlock Classes="mono" Text="{Binding PreviousCode}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Classes="label" Text="{loc:T Totp_Next}" />
+                            <TextBlock Classes="mono" Text="{Binding NextCode}" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{loc:T Totp_CodesNote}" />
+
+                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                            Tag="{Binding CurrentCodeRaw}" Click="Copy_Click" />
+                </StackPanel>
+            </Border>
+
+            <!-- Проверка кода -->
+            <Border Classes="card" IsVisible="{Binding IsSecretValid}">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T Totp_Verify}" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Totp_VerifyHint}" />
+
+                    <TextBlock Text="{loc:T Totp_CodeInput}" />
+                    <TextBox Classes="mono" Text="{Binding VerifyCode}" />
+
+                    <TextBlock Text="{loc:T Totp_Window}" />
+                    <ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding WindowIndex}">
+                        <ComboBoxItem Content="0" />
+                        <ComboBoxItem Content="±1" />
+                        <ComboBoxItem Content="±2" />
+                    </ComboBox>
+
+                    <Border Classes="status"
+                            Classes.ok="{Binding VerifyOk}"
+                            Classes.bad="{Binding VerifyBad}"
+                            IsVisible="{Binding HasVerify}">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding VerifyHeadline}" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- otpauth и QR -->
+            <Border Classes="card" IsVisible="{Binding IsSecretValid}">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T Totp_Qr}" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Totp_QrHint}" />
+
+                    <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto" RowSpacing="10">
+                        <TextBlock VerticalAlignment="Center" Text="{loc:T Totp_Issuer}" />
+                        <TextBox Grid.Column="1" Text="{Binding Issuer}" />
+                        <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="{loc:T Totp_Account}" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Account}" />
+                    </Grid>
+
+                    <Border Background="White" CornerRadius="10" Padding="10" HorizontalAlignment="Left"
+                            IsVisible="{Binding HasQr}">
+                        <Image Source="{Binding QrImage}" Width="240" Height="240" />
+                    </Border>
+
+                    <TextBlock Classes="label" Text="{loc:T Totp_Uri}" />
+                    <TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                             Text="{Binding OtpUri, Mode=OneWay}" />
+                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                            Tag="{Binding OtpUri}" Click="Copy_Click" />
+                    <TextBlock Classes="muted" FontSize="11" Text="{loc:T Hash_CopyNote}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

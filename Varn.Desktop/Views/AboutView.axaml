@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:svc="using:Varn.Desktop.Services"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="1000"
+             x:Class="Varn.Desktop.Views.AboutView"
+             x:DataType="vm:AboutViewModel">
+    <Design.DataContext>
+        <vm:AboutViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+            <!-- Шапка -->
+            <StackPanel Orientation="Horizontal" Spacing="18">
+                <Image Source="avares://Varn.Desktop/Assets/varn-256.png" Width="64" Height="64"
+                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                <StackPanel VerticalAlignment="Center" Spacing="4">
+                    <TextBlock Classes="h1" Text="{loc:T About_Title}" />
+                    <TextBlock Classes="muted" Text="{Binding Version}" />
+                </StackPanel>
+            </StackPanel>
+            <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T About_Subtitle}" />
+
+            <!-- Возможности -->
+            <Border Classes="card">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="{loc:T About_Features}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_F1}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_F2}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_F3}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_F4}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Приватность и безопасность -->
+            <Border Classes="card">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="{loc:T About_Privacy}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_P1}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_P2}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_P3}" />
+                    <TextBlock Classes="warn" TextWrapping="Wrap" Text="{loc:T About_P4}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_P5}" />
+                    <TextBlock TextWrapping="Wrap" Text="{loc:T About_P6}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Библиотеки -->
+            <Border Classes="card">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="{loc:T About_Libs}" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T About_LibsList}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Ссылки -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T About_Links}" />
+                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left"
+                                         Icon="{StaticResource IconOpen}" Text="{loc:T About_GitHub}"
+                                         Tag="{x:Static svc:AppInfo.GitHubUrl}" Click="Link_Click" />
+                    <TextBlock Classes="muted" FontSize="11" Text="{loc:T About_Author}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,123 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
+             x:Class="Varn.Desktop.Views.HashSettingsView"
+             x:DataType="vm:HashSettingsViewModel">
+	<StackPanel Spacing="18">
+
+		<Border Classes="card">
+			<StackPanel Spacing="14">
+				<TextBlock Classes="label" Text="{loc:T Hash_Algorithm}" />
+				<ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding AlgorithmIndex}">
+					<ComboBoxItem Content="Argon2id" />
+					<ComboBoxItem Content="bcrypt" />
+					<ComboBoxItem Content="PBKDF2" />
+					<ComboBoxItem Content="scrypt" />
+					<ComboBoxItem Content="SHA-256 (legacy)" />
+					<ComboBoxItem Content="MD5 (legacy)" />
+					<ComboBoxItem Content="SHA-1 (legacy)" />
+				</ComboBox>
+
+				<StackPanel Spacing="8" IsVisible="{Binding HasFormatChoice}">
+					<TextBlock Classes="label" Text="{loc:T Hash_Format}" />
+					<RadioButton IsChecked="{Binding UsePhc}" Content="{loc:T Fmt_Phc}" />
+					<RadioButton IsChecked="{Binding UseRaw}" Content="{loc:T Fmt_Raw}" />
+				</StackPanel>
+			</StackPanel>
+		</Border>
+
+		<Border Classes="card">
+			<StackPanel Spacing="12">
+				<TextBlock Classes="label" Text="{loc:T Hash_Params}" />
+
+				<!-- Argon2id -->
+				<StackPanel Spacing="10" IsVisible="{Binding IsArgon2}">
+					<Grid ColumnDefinitions="180,*,90">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_Iterations}" />
+						<Slider Grid.Column="1" Minimum="1" Maximum="10" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding ArgonIterations}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding ArgonIterations, StringFormat={}{0:N0}}" />
+					</Grid>
+					<Grid ColumnDefinitions="180,*,90">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_MemoryMb}" />
+						<Slider Grid.Column="1" Minimum="8" Maximum="1024" TickFrequency="8"
+                                IsSnapToTickEnabled="True" Value="{Binding ArgonMemoryMb}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding ArgonMemoryMb, StringFormat={}{0:N0}}" />
+					</Grid>
+					<Grid ColumnDefinitions="180,*,90">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_Parallelism}" />
+						<Slider Grid.Column="1" Minimum="1" Maximum="16" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding ArgonParallelism}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding ArgonParallelism, StringFormat={}{0:N0}}" />
+					</Grid>
+				</StackPanel>
+
+				<!-- bcrypt -->
+				<Grid ColumnDefinitions="180,*,90" IsVisible="{Binding IsBCrypt}">
+					<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_WorkFactor}" />
+					<Slider Grid.Column="1" Minimum="4" Maximum="16" TickFrequency="1"
+                            IsSnapToTickEnabled="True" Value="{Binding BcryptWorkFactor}" />
+					<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                               Text="{Binding BcryptWorkFactor, StringFormat={}{0:N0}}" />
+				</Grid>
+
+				<!-- PBKDF2 -->
+				<StackPanel Spacing="10" IsVisible="{Binding IsPbkdf2}">
+					<Grid ColumnDefinitions="180,*,90">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_Iterations}" />
+						<Slider Grid.Column="1" Minimum="100000" Maximum="2000000" TickFrequency="10000"
+                                IsSnapToTickEnabled="True" Value="{Binding Pbkdf2Iterations}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding Pbkdf2Iterations, StringFormat={}{0:N0}}" />
+					</Grid>
+					<Grid ColumnDefinitions="180,*">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_PbkdfHash}" />
+						<ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                  SelectedIndex="{Binding Pbkdf2HashIndex}">
+							<ComboBoxItem Content="SHA-256" />
+							<ComboBoxItem Content="SHA-512" />
+						</ComboBox>
+					</Grid>
+				</StackPanel>
+
+				<!-- scrypt -->
+				<StackPanel Spacing="10" IsVisible="{Binding IsScrypt}">
+					<Grid ColumnDefinitions="180,*,170">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_CostN}" />
+						<Slider Grid.Column="1" Minimum="12" Maximum="20" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding ScryptLogN}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding ScryptCostDisplay}" />
+					</Grid>
+					<Grid ColumnDefinitions="180,*,170">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_BlockSize}" />
+						<Slider Grid.Column="1" Minimum="1" Maximum="16" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding ScryptBlockSize}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding ScryptBlockSize, StringFormat={}{0:N0}}" />
+					</Grid>
+					<Grid ColumnDefinitions="180,*,170">
+						<TextBlock VerticalAlignment="Center" Text="{loc:T Hash_Parallelism}" />
+						<Slider Grid.Column="1" Minimum="1" Maximum="8" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Value="{Binding ScryptParallelism}" />
+						<TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Text="{Binding ScryptParallelism, StringFormat={}{0:N0}}" />
+					</Grid>
+				</StackPanel>
+
+				<!-- Legacy -->
+				<StackPanel Spacing="10" IsVisible="{Binding IsLegacy}">
+					<CheckBox IsChecked="{Binding LegacyUseSalt}" Content="{loc:T Hash_UseSalt}" />
+					<TextBlock Classes="warn" TextWrapping="Wrap" Text="{loc:T Hash_LegacyNote}" />
+				</StackPanel>
+			</StackPanel>
+		</Border>
+	</StackPanel>
+</UserControl>

@@ -1,0 +1,166 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="1100"
+             x:Class="Varn.Desktop.Views.KeysView"
+             x:DataType="vm:KeysViewModel">
+	<Design.DataContext>
+		<vm:KeysViewModel />
+	</Design.DataContext>
+
+	<ScrollViewer>
+		<StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+			<StackPanel Spacing="6">
+				<TextBlock Classes="h1" Text="{loc:T Keys_Title}" />
+				<TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Keys_Subtitle}" />
+			</StackPanel>
+
+			<!-- Секретный ключ -->
+			<Border Classes="card">
+				<StackPanel Spacing="14">
+					<TextBlock Classes="label" Text="{loc:T Keys_SecretTitle}" />
+					<TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Keys_SecretHint}" />
+
+					<TextBlock Text="{loc:T Keys_LengthBits}" />
+					<ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding SecretBitsIndex}">
+						<ComboBoxItem Content="128" />
+						<ComboBoxItem Content="256" />
+						<ComboBoxItem Content="512" />
+					</ComboBox>
+
+					<StackPanel Orientation="Horizontal" Spacing="12">
+						<controls:IconButton Classes="primary" Icon="{StaticResource IconDice}" Text="{loc:T Keys_GenerateSecret}"
+                                Command="{Binding GenerateSecretCommand}" />
+						<controls:IconButton Classes="ghost" Icon="{StaticResource IconClear}" Text="{loc:T Hash_Clear}"
+                                IsVisible="{Binding HasSecret}"
+                                Command="{Binding ClearSecretCommand}" />
+					</StackPanel>
+
+					<StackPanel Spacing="8" IsVisible="{Binding HasSecret}">
+						<TextBlock Classes="label" Text="Base64" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding SecretBase64, Mode=OneWay}" />
+						<controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                Tag="{Binding SecretBase64}" Click="Copy_Click" />
+
+						<TextBlock Classes="label" Margin="0,8,0,0" Text="Hex" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding SecretHex, Mode=OneWay}" />
+						<controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                Tag="{Binding SecretHex}" Click="Copy_Click" />
+
+						<TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Keys_Base32}" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding SecretBase32, Mode=OneWay}" />
+						<controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                Tag="{Binding SecretBase32}" Click="Copy_Click" />
+
+						<TextBlock Classes="muted" FontSize="11" Text="{loc:T Hash_CopyNote}" />
+					</StackPanel>
+				</StackPanel>
+			</Border>
+
+			<!-- Пара ключей -->
+			<Border Classes="card">
+				<StackPanel Spacing="14">
+					<TextBlock Classes="label" Text="{loc:T Keys_PairTitle}" />
+					<TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Keys_PairHint}" />
+
+					<TextBlock Text="{loc:T Keys_Type}" />
+					<ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding KeyTypeIndex}">
+						<ComboBoxItem Content="RSA" />
+						<ComboBoxItem Content="ECDSA" />
+					</ComboBox>
+
+					<StackPanel Spacing="8" IsVisible="{Binding IsRsa}">
+						<TextBlock Text="{loc:T Keys_RsaSize}" />
+						<ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding RsaSizeIndex}">
+							<ComboBoxItem Content="2048" />
+							<ComboBoxItem Content="3072" />
+							<ComboBoxItem Content="4096" />
+						</ComboBox>
+						<TextBlock Classes="muted" FontSize="11" Text="{loc:T Keys_Slow}" />
+					</StackPanel>
+
+					<StackPanel Spacing="8" IsVisible="{Binding !IsRsa}">
+						<TextBlock Text="{loc:T Keys_Curve}" />
+						<ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding EcCurveIndex}">
+							<ComboBoxItem Content="P-256 (ES256)" />
+							<ComboBoxItem Content="P-384 (ES384)" />
+							<ComboBoxItem Content="P-521 (ES512)" />
+						</ComboBox>
+					</StackPanel>
+
+					<TextBlock Text="{loc:T Keys_Password}" />
+					<Grid ColumnDefinitions="*,Auto">
+						<TextBox Classes="mono" Text="{Binding KeyPassword}"
+                                 PasswordChar="{Binding KeyPasswordChar}" />
+						<ToggleButton Grid.Column="1" Margin="8,0,0,0"
+						              IsChecked="{Binding RevealKeyPassword}"
+						              ToolTip.Tip="{loc:T Hash_Show}">
+							<Panel>
+								<PathIcon Width="18" Height="18" Data="{StaticResource IconEye}"
+								          IsVisible="{Binding !RevealKeyPassword}" />
+								<PathIcon Width="18" Height="18" Data="{StaticResource IconEyeOff}"
+								          IsVisible="{Binding RevealKeyPassword}" />
+							</Panel>
+						</ToggleButton>
+					</Grid>
+					<TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                               Text="{loc:T Keys_PasswordHint}" />
+
+					<StackPanel Orientation="Horizontal" Spacing="12">
+						<controls:IconButton Classes="primary" Icon="{StaticResource IconKeyPlus}" Text="{loc:T Keys_GeneratePair}"
+                                Command="{Binding GeneratePairCommand}" />
+						<controls:IconButton Classes="ghost" Icon="{StaticResource IconClear}" Text="{loc:T Hash_Clear}"
+                                IsVisible="{Binding HasPair}"
+                                Command="{Binding ClearPairAndPasswordCommand}" />
+					</StackPanel>
+					<ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+					<TextBlock Classes="error" TextWrapping="Wrap" IsVisible="{Binding HasError}"
+                               Text="{Binding ErrorMessage}" />
+
+					<StackPanel Spacing="8" IsVisible="{Binding HasPair}">
+						<TextBlock Classes="muted" Text="{Binding PairDescription}" />
+
+						<TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Keys_Private}" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding PrivateKeyPem, Mode=OneWay}" />
+						<TextBlock Classes="warn" TextWrapping="Wrap" IsVisible="{Binding PrivateUnencrypted}"
+                                   Text="{loc:T Keys_PrivateWarn}" />
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<controls:IconButton Classes="ghost" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                    Tag="{Binding PrivateKeyPem}" Click="Copy_Click" />
+							<controls:IconButton Classes="ghost" Icon="{StaticResource IconSave}" Text="{loc:T Keys_Save}" Click="SavePrivate_Click" />
+						</StackPanel>
+
+						<TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Keys_Public}" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding PublicKeyPem, Mode=OneWay}" />
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<controls:IconButton Classes="ghost" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                    Tag="{Binding PublicKeyPem}" Click="Copy_Click" />
+							<controls:IconButton Classes="ghost" Icon="{StaticResource IconSave}" Text="{loc:T Keys_Save}" Click="SavePublic_Click" />
+						</StackPanel>
+
+						<TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Keys_Jwk}" />
+						<TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                 Text="{Binding PublicJwk, Mode=OneWay}" />
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<controls:IconButton Classes="ghost" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                    Tag="{Binding PublicJwk}" Click="Copy_Click" />
+							<controls:IconButton Classes="ghost" Icon="{StaticResource IconSave}" Text="{loc:T Keys_Save}" Click="SaveJwk_Click" />
+						</StackPanel>
+
+						<TextBlock Classes="muted" FontSize="11" Text="{loc:T Hash_CopyNote}" />
+					</StackPanel>
+				</StackPanel>
+			</Border>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>

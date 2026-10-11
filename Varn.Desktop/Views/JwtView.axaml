@@ -1,0 +1,171 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="1100"
+             x:Class="Varn.Desktop.Views.JwtView"
+             x:DataType="vm:JwtViewModel">
+    <Design.DataContext>
+        <vm:JwtViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="h1" Text="{loc:T Jwt_Title}" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Jwt_Subtitle}" />
+            </StackPanel>
+
+            <TabControl SelectedIndex="{Binding SelectedTabIndex}">
+
+                <!-- Просмотр и проверка -->
+                <TabItem Header="{loc:T Jwt_TabInspect}">
+                    <StackPanel Spacing="18" Margin="0,18,0,0">
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="label" Text="{loc:T Jwt_Token}" />
+                                <TextBox Classes="mono" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="110"
+                                         Text="{Binding Token}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="label" Text="{loc:T Jwt_VerifyKey}" />
+                                <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Jwt_VerifyKeyHint}" />
+                                <TextBox Classes="mono" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90"
+                                         Text="{Binding VerifyKey}" />
+                                <CheckBox IsChecked="{Binding SecretIsBase64}"
+                                          Content="{loc:T Jwt_SecretBase64}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="status"
+                                Classes.ok="{Binding SigOk}"
+                                Classes.bad="{Binding SigBad}"
+                                Classes.warn="{Binding SigWarn}"
+                                IsVisible="{Binding HasSig}">
+                            <StackPanel Spacing="4">
+                                <TextBlock FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding SigHeadline}" />
+                                <TextBlock Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasSigDetail}"
+                                           Text="{Binding SigDetail}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card" IsVisible="{Binding HasDecoded}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="label" Text="{loc:T Jwt_Algorithm}" />
+                                <TextBlock Text="{Binding AlgorithmText}" />
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock IsVisible="{Binding HasIat}" Text="{Binding IatLine}" />
+                                    <TextBlock IsVisible="{Binding HasNbf}" Text="{Binding NbfLine}" />
+                                    <TextBlock IsVisible="{Binding HasExp}" Text="{Binding ExpLine}" />
+                                </StackPanel>
+
+                                <TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Jwt_Header}" />
+                                <TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                         Text="{Binding HeaderJson, Mode=OneWay}" />
+
+                                <TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Jwt_Payload}" />
+                                <TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                         Text="{Binding PayloadJson, Mode=OneWay}" />
+                                <controls:IconButton Classes="ghost" HorizontalAlignment="Left" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                        Tag="{Binding PayloadJson}" Click="Copy_Click" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- Создание -->
+                <TabItem Header="{loc:T Jwt_TabGenerate}">
+                    <StackPanel Spacing="18" Margin="0,18,0,0">
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="12">
+                                <TextBlock Classes="label" Text="{loc:T Jwt_Algorithm}" />
+                                <ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding GenAlgorithmIndex}">
+                                    <ComboBoxItem Content="HS256" />
+                                    <ComboBoxItem Content="HS384" />
+                                    <ComboBoxItem Content="HS512" />
+                                    <ComboBoxItem Content="RS256" />
+                                    <ComboBoxItem Content="RS384" />
+                                    <ComboBoxItem Content="RS512" />
+                                    <ComboBoxItem Content="PS256" />
+                                    <ComboBoxItem Content="PS384" />
+                                    <ComboBoxItem Content="PS512" />
+                                    <ComboBoxItem Content="ES256" />
+                                    <ComboBoxItem Content="ES384" />
+                                    <ComboBoxItem Content="ES512" />
+                                </ComboBox>
+
+                                <TextBlock Classes="label" Text="{Binding GenKeyLabel}" />
+                                <TextBox Classes="mono" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90"
+                                         Text="{Binding GenKey}" />
+
+                                <CheckBox IsVisible="{Binding IsGenHmac}"
+                                          IsChecked="{Binding GenSecretIsBase64}"
+                                          Content="{loc:T Jwt_SecretBase64}" />
+
+                                <StackPanel Spacing="8" IsVisible="{Binding !IsGenHmac}">
+                                    <TextBlock Text="{loc:T Jwt_GenKeyPassword}" />
+                                    <TextBox Classes="mono" PasswordChar="•" Text="{Binding GenKeyPassword}" />
+                                </StackPanel>
+
+                                <TextBlock Text="{loc:T Jwt_KeyId}" />
+                                <TextBox Classes="mono" Text="{Binding GenKeyId}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="12">
+                                <TextBlock Classes="label" Text="{loc:T Jwt_PayloadEdit}" />
+                                <TextBox Classes="mono" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="140"
+                                         Text="{Binding GenPayload}" />
+
+                                <CheckBox IsChecked="{Binding AddIssuedAt}" Content="{loc:T Jwt_AddIat}" />
+
+                                <Grid ColumnDefinitions="140,*,130">
+                                    <TextBlock VerticalAlignment="Center" Text="{loc:T Jwt_ExpiresIn}" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="1440" TickFrequency="5"
+                                            IsSnapToTickEnabled="True" Value="{Binding ExpiresInMinutes}" />
+                                    <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                               Text="{Binding ExpiresText}" />
+                                </Grid>
+                                <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap"
+                                           Text="{loc:T Jwt_OverrideNote}" />
+                            </StackPanel>
+                        </Border>
+
+                        <controls:IconButton Classes="primary" HorizontalAlignment="Left" Icon="{StaticResource IconShieldPlus}" Text="{loc:T Jwt_Generate}"
+                                Command="{Binding GenerateTokenCommand}" />
+                        <TextBlock Classes="error" TextWrapping="Wrap" IsVisible="{Binding HasGenError}"
+                                   Text="{Binding GenError}" />
+
+                        <Border Classes="card" IsVisible="{Binding HasGeneratedToken}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Classes="label" Text="{loc:T Jwt_GeneratedToken}" />
+                                <TextBox Classes="mono" IsReadOnly="True" TextWrapping="Wrap"
+                                         Text="{Binding GeneratedToken, Mode=OneWay}" />
+                                <TextBlock Classes="warn" TextWrapping="Wrap" IsVisible="{Binding HasGenWarning}"
+                                           Text="{Binding GenWarning}" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <controls:IconButton Classes="ghost" Icon="{StaticResource IconCopy}" Text="{loc:T Hash_Copy}"
+                                            Tag="{Binding GeneratedToken}" Click="Copy_Click" />
+                                    <controls:IconButton Classes="ghost" Icon="{StaticResource IconSearch}" Text="{loc:T Jwt_OpenInspector}"
+                                            Command="{Binding OpenInInspectorCommand}" />
+                                </StackPanel>
+                                <TextBlock Classes="muted" FontSize="11" Text="{loc:T Hash_CopyNote}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

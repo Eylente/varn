@@ -73,4 +73,32 @@ public static class KeyPairGenerator
             : key.ExportEncryptedPkcs8PrivateKeyPem(
                 password,
                 new PbeParameters(PbeEncryptionAlgorithm.Aes256Cbc, HashAlgorithmName.SHA256, PbeIterations));
+    
+    /// <summary>Восстанавливает публичный ключ (PEM) из приватного. Возвращает null, если ключ не читается.</summary>
+    public static string? TryDerivePublicPem(string privateKeyPem, string? password = null)
+    {
+        if (string.IsNullOrWhiteSpace(privateKeyPem)) return null;
+
+        using var rsa = RSA.Create();
+        if (TryImport(rsa, privateKeyPem, password)) return rsa.ExportSubjectPublicKeyInfoPem();
+
+        using var ecdsa = ECDsa.Create();
+        if (TryImport(ecdsa, privateKeyPem, password)) return ecdsa.ExportSubjectPublicKeyInfoPem();
+
+        return null;
+    }
+
+    private static bool TryImport(AsymmetricAlgorithm key, string pem, string? password)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(password)) key.ImportFromPem(pem);
+            else key.ImportFromEncryptedPem(pem, password);
+            return true;
+        }
+        catch (Exception ex) when (ex is ArgumentException or CryptographicException)
+        {
+            return false;
+        }
+    }
 }

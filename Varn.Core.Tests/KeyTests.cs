@@ -73,4 +73,25 @@ public class KeyTests
         using var bad = ECDsa.Create();
         Assert.ThrowsAny<CryptographicException>(() => bad.ImportFromEncryptedPem(pair.PrivateKeyPem, "wrong"));
     }
+    
+    [Fact]
+    public void TryDerivePublicPem_ReturnsMatchingPublicKey()
+    {
+        var rsa = KeyPairGenerator.GenerateRsa(2048);
+        var ec = KeyPairGenerator.GenerateEc(EcCurveName.P256);
+
+        Assert.Equal(rsa.PublicKeyPem, KeyPairGenerator.TryDerivePublicPem(rsa.PrivateKeyPem));
+        Assert.Equal(ec.PublicKeyPem, KeyPairGenerator.TryDerivePublicPem(ec.PrivateKeyPem));
+    }
+
+    [Fact]
+    public void TryDerivePublicPem_Encrypted_NeedsCorrectPassword()
+    {
+        var pair = KeyPairGenerator.GenerateEc(EcCurveName.P256, privateKeyPassword: "pw-1");
+
+        Assert.Equal(pair.PublicKeyPem, KeyPairGenerator.TryDerivePublicPem(pair.PrivateKeyPem, "pw-1"));
+        Assert.Null(KeyPairGenerator.TryDerivePublicPem(pair.PrivateKeyPem, "wrong"));
+        Assert.Null(KeyPairGenerator.TryDerivePublicPem(pair.PrivateKeyPem));
+        Assert.Null(KeyPairGenerator.TryDerivePublicPem("not a key"));
+    }
 }

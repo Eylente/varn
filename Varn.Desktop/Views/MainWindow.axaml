@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Varn.Desktop.ViewModels"
+        xmlns:loc="using:Varn.Desktop.Localization"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="using:Varn.Desktop.Controls"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="720"
+        x:Class="Varn.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/varn-256.png"
+        Title="Varn"
+        Width="1100" Height="720" MinWidth="900" MinHeight="600">
+
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="250,*">
+
+        <Border Background="{DynamicResource VarnSurfaceBrush}"
+                BorderBrush="{DynamicResource VarnBorderBrush}"
+                BorderThickness="0,0,1,0">
+            <DockPanel Margin="16">
+
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="6,6,0,26">
+                    <Image Source="avares://Varn.Desktop/Assets/varn-256.png" Width="38" Height="38"
+                           RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Varn" FontSize="18" FontWeight="SemiBold" />
+                        <TextBlock Classes="muted" FontSize="11" MaxWidth="150" TextWrapping="Wrap"
+                                   Text="{loc:T App_Tagline}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <controls:IconButton DockPanel.Dock="Bottom" Classes="ghost" HorizontalAlignment="Stretch"
+                                     HorizontalContentAlignment="Center"
+                                     Icon="{StaticResource IconTranslate}"
+                                     Text="{Binding LanguageButtonText}"
+                                     Command="{Binding ToggleLanguageCommand}" />
+
+                <ListBox Classes="nav"
+                         ItemsSource="{Binding Pages}"
+                         SelectedItem="{Binding SelectedPage}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PageViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Width="18" Height="18" Data="{Binding Icon}" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Title}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <ContentControl Grid.Column="1" Content="{Binding SelectedPage}" />
+    </Grid>
+</Window>

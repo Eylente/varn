@@ -1,0 +1,143 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <Color x:Key="VarnBg">#0B0F18</Color>
+        <Color x:Key="VarnSurface">#121826</Color>
+        <Color x:Key="VarnSurface2">#1A2133</Color>
+        <Color x:Key="VarnBorder">#273049</Color>
+        <Color x:Key="VarnText">#E8ECF4</Color>
+        <Color x:Key="VarnMuted">#8B95AB</Color>
+        <Color x:Key="VarnAmber">#FFB020</Color>
+        <Color x:Key="VarnRaspberry">#E0386B</Color>
+        <Color x:Key="VarnBlue">#4DA3FF</Color>
+
+        <SolidColorBrush x:Key="VarnSurfaceBrush" Color="{StaticResource VarnSurface}" />
+        <SolidColorBrush x:Key="VarnSurface2Brush" Color="{StaticResource VarnSurface2}" />
+        <SolidColorBrush x:Key="VarnBorderBrush" Color="{StaticResource VarnBorder}" />
+        <SolidColorBrush x:Key="VarnMutedBrush" Color="{StaticResource VarnMuted}" />
+        <SolidColorBrush x:Key="VarnAmberBrush" Color="{StaticResource VarnAmber}" />
+        <SolidColorBrush x:Key="VarnRaspberryBrush" Color="{StaticResource VarnRaspberry}" />
+        <SolidColorBrush x:Key="VarnBlueBrush" Color="{StaticResource VarnBlue}" />
+
+        <LinearGradientBrush x:Key="VarnAccentGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="{StaticResource VarnAmber}" Offset="0" />
+            <GradientStop Color="{StaticResource VarnRaspberry}" Offset="1" />
+        </LinearGradientBrush>
+    </Styles.Resources>
+
+    <!-- Текст -->
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+        <Setter Property="Foreground" Value="{DynamicResource VarnMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource VarnBlueBrush}" />
+    </Style>
+    <Style Selector="TextBlock.warn">
+        <Setter Property="Foreground" Value="{DynamicResource VarnAmberBrush}" />
+    </Style>
+    <Style Selector="TextBlock.error">
+        <Setter Property="Foreground" Value="{DynamicResource VarnRaspberryBrush}" />
+    </Style>
+
+    <!-- Карточка -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource VarnSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+
+    <!-- Моноширинные поля -->
+    <Style Selector="TextBox.mono">
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono, monospace" />
+    </Style>
+
+    <!-- Кнопки -->
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{DynamicResource VarnAmberBrush}" />
+        <Setter Property="Foreground" Value="#1A1206" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="20,11" />
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#FFC24D" />
+        <Setter Property="Foreground" Value="#1A1206" />
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#E09A10" />
+        <Setter Property="Foreground" Value="#1A1206" />
+    </Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <Style Selector="Button.ghost">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,9" />
+    </Style>
+    <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource VarnSurface2Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnAmberBrush}" />
+    </Style>
+
+    <!-- Боковая навигация -->
+    <Style Selector="ListBox.nav">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem">
+        <Setter Property="Padding" Value="14,11" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource VarnSurface2Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource VarnAmberBrush}" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource VarnSurface2Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource VarnAmberBrush}" />
+    </Style>
+    
+    <!-- Блок статуса -->
+    <Style Selector="Border.status">
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="14,12" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource VarnSurface2Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnBorderBrush}" />
+    </Style>
+    <Style Selector="Border.status.ok">
+        <Setter Property="Background" Value="#264DA3FF" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnBlueBrush}" />
+    </Style>
+    <Style Selector="Border.status.bad">
+        <Setter Property="Background" Value="#26E0386B" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnRaspberryBrush}" />
+    </Style>
+    <Style Selector="Border.status.warn">
+        <Setter Property="Background" Value="#26FFB020" />
+        <Setter Property="BorderBrush" Value="{DynamicResource VarnAmberBrush}" />
+    </Style>
+    
+    <Style Selector="TextBlock.mono">
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono, monospace" />
+    </Style>
+    <Style Selector="TextBlock.code">
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono, monospace" />
+        <Setter Property="FontSize" Value="44" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource VarnAmberBrush}" />
+    </Style>
+</Styles>
