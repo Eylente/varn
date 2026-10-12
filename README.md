@@ -1,140 +1,76 @@
-# Basalt 🛡️
+<div align="center">
 
-**Basalt** is a specialized, production-ready desktop tool for developers and security professionals designed for generating reliable cryptographic resources, analyzing secure tokens, and testing authentication mechanisms. Operating completely offline under a strict zero-knowledge architecture, it focuses on providing an intuitive yet powerful interface for complex cryptographic operations.
+<img src="docs/icon.png" width="96" alt="Varn logo" />
 
----
+# Varn
 
-## Technical Interface & Features
+**An offline cryptography toolkit for developers.**
+Hash passwords, generate keys, inspect JWTs and test one-time codes. Everything runs on your computer.
 
-### 🔑 Key Generation
-Generates high-entropy cryptographically secure pseudo-random secrets with targeted bit depths (128, 256, or 512 bits). Outputs are automatically encoded into multiple standard formats concurrently alongside context-aware integration guides.
+[English](README.md) · [Русский](README.ru.md)
 
-<details>
-  <summary>📸 View Key Generation Module Interface</summary>
+</div>
 
-  ![Key Generation Module](assets/keys_tab.png)
+> Varn was previously called **Basalt**.
 
-</details>
+## Why
 
-* **Multi-Format Encoding:** Provides instantaneous output for Base64 strings, raw HEX streams, and stripped Base32 formats.
-* **Adaptive Guidance:** Displays direct documentation mappings detailing precise use-cases (e.g., JWT Signing Keys, AES symmetric keys, or TOTP registration strings) depending on the selected length.
+Many everyday crypto tasks (hashing a test password, decoding a token, checking a TOTP secret) are usually done on websites. Pasting real secrets into a website is a bad habit. Varn does the same jobs locally and never touches the network.
 
----
+## Features
 
-### 🧮 Password Engineering (Single Hash)
-Allows real-time evaluation and configuration of single-credential hashing models leveraging underlying parameters pulled directly from the batch-processing engine.
+- **Password hashing**: Argon2id, bcrypt, PBKDF2 (SHA-256/512) and scrypt, with sensible defaults (Argon2id t=3, 64 MiB, p=4; PBKDF2 600,000 iterations; bcrypt cost 12; scrypt N=2^16). Output as a PHC string or as separate hash, salt and parameters. Legacy SHA-256, MD5 and SHA-1 are available only to emulate old systems.
+- **Batch hashing from Excel**: hash a whole column of passwords (`Login`, `Password`) and get hash, salt, algorithm, parameters and notes back. Parallelism is limited by available memory, and the run can be cancelled.
+- **Keys**: random secrets (128/256/512 bit as Base64, Hex or Base32) and RSA (2048/3072/4096) or ECDSA (P-256/384/521) key pairs. Export as PEM (PKCS#8 and SPKI) or JWK, optionally with an AES-256 encrypted private key.
+- **JWT**: decode and verify HS256/384/512, RS256/384/512, PS256/384/512 and ES256/384/512, or create signed tokens. Warns about `alg: none`, algorithm-confusion keys and weak secrets, and shows `iat`, `nbf` and `exp` with their status.
+- **TOTP (RFC 6238)**: live codes with previous and next codes, SHA-1/256/512, 6-8 digits, 15/30/60 s periods, verification with a configurable time drift, and `otpauth://` links with QR codes for authenticator apps.
+- Cross-platform UI built with Avalonia, in English and Russian.
 
-<details>
-  <summary>📸 View Single Hash Module Interface</summary>
+## Screenshots
 
-  ![Single Hash Module](assets/single_tab.png)
+![Password hashing](docs/screenshots/hash.png)
+![Excel batch](docs/screenshots/excel.png)
+![Keys](docs/screenshots/keys.png)
+![JWT](docs/screenshots/jwt.png)
+![TOTP](docs/screenshots/totp.png)
 
-</details>
+## Download
 
-* **State Inheritance:** Inherits runtime parameters seamlessly from the primary Excel configuration view to prevent administrative workflow disconnects.
-* **Isolated Output Inspectors:** Separates the finalized password string hash from its unique Base64 cryptographically secure initialization vector (Salt) for deep inspecting.
+Get the latest build from the [Releases](https://github.com/Eylente/varn/releases) page. The Windows build is self-contained and does not need .NET installed. A Linux build is provided as well, but it has not been tested yet.
 
----
+## Build from source
 
-### 📊 Batch Processing & Excel Integration
-Designed for enterprise migration, database population, and bulk account audits. Supports flexible, multi-threaded calculations across four core algorithmic strategies.
+You need the [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
-<details>
-  <summary>⚙️ View Argon2id Parameter Configuration</summary>
+```bash
+git clone https://github.com/Eylente/varn.git
+cd varn
+dotnet run --project Varn.Desktop
+dotnet test
+```
 
-  ![Argon2id Hashing Config](assets/excel_tab_argon2.png)
+## Project layout
 
-</details>
+| Project | Description |
+|---|---|
+| `Varn.Core` | Hashing, keys, JWT and TOTP logic. No UI dependencies. |
+| `Varn.Desktop` | The Avalonia desktop app (MVVM). |
+| `Varn.Core.Tests` | xUnit tests, including known-answer vectors (RFC 6238, RFC 7914, PBKDF2-SHA256, a jwt.io token). |
 
-<details>
-  <summary>⚙️ View BCrypt Parameter Configuration</summary>
+## Security notes and limitations
 
-  ![BCrypt Hashing Config](assets/excel_tab_bcrypt.png)
+- Varn works fully offline. The only thing it saves to disk is the interface language (`settings.json` in your user profile).
+- Varn has **not been independently audited**. It is a tool for development and diagnostics, so do not use it to create secrets that protect real systems.
+- Cryptography comes from well-known libraries (.NET, Konscious.Security.Cryptography for Argon2, BCrypt.Net-Next, BouncyCastle for scrypt, Otp.NET), not from custom implementations.
+- Passwords and secrets are entered as .NET strings, which cannot be wiped from memory. Varn wipes the byte buffers it creates itself and clears copied values from the clipboard after 30 seconds. This does not protect against someone who can read your computer's memory, and clipboard managers (such as Windows clipboard history) keep their own copies.
+- Legacy hashes (MD5, SHA-1, plain SHA-256) are insecure. bcrypt only uses the first 72 bytes of a password.
 
-</details>
+## Ideas for later
 
-<details>
-  <summary>⚙️ View PBKDF2 Parameter Configuration</summary>
+- Verify an existing hash against a password
+- Ed25519 keys
+- Tested Linux and macOS builds
 
-  ![PBKDF2 Hashing Config](assets/excel_tab_pbkdf2.png)
+## License
 
-</details>
-
-<details>
-  <summary>⚙️ View Legacy SHA256 Configuration & Warnings</summary>
-
-  ![Legacy Hashing Config](assets/excel_tab_legacy.png)
-
-</details>
-
-* **Template Automation:** Features an integrated spreadsheet schema generator (`ClosedXML`) creating clean, structured target fields ensuring data parsing compatibility.
-* **Granular Hardware Sliders:** Direct tuning bounds over intense memory footprints (RAM allocation limits), compute iteration passes, and parallel thread limits matching specialized hardware environments.
-* **Cryptographic Safeguards:** Includes contextual alerts and proactive mitigation systems (e.g., automatic warning banners when attempting un-salted legacy SHA256 computations).
-
----
-
-### 🌱 Database Seed Generator
-Generates mock user environments to facilitate deterministic database seeding without the processing inefficiencies or data overlap characteristic of simple randomized loops.
-
-<details>
-  <summary>📸 View Database Seed Generator Interface</summary>
-
-  ![Database Seed Generator](assets/seed_gen_tab.png)
-
-</details>
-
-* **Entity Customization:** Supports optional targeted parameters including full names, structural breakdown splits (Last/First/Middle formatting blocks), randomized matching passwords, emails, secure telephone links, security access levels, and active system operational states.
-* **Proportional 2FA Secret Seeding:** Employs a zero-waste target distribution engine assigning Base32 secrets across exact user-specified sample percentages, optimizing database population on smaller unit testing pools.
-
----
-
-### ⏱️ 2FA Codes (TOTP Monitor)
-A diagnostic utility verifying the validity, time-drift synchronization, and parsing accurate token generation for time-based one-time authorization tokens.
-
-<details>
-  <summary>📸 View 2FA Monitor Interface</summary>
-
-  ![2FA TOTP Monitor](assets/2fa_codes_tab.png)
-
-</details>
-
-* **Active Lifetime Tracker:** Features a precision 30-second countdown system tied to a clean UI progress visual overlay reflecting transient authentication valid ranges.
-* **Robust Key Normalization:** Cleans formatting variances during manual key entry to seamlessly parse raw authorization structures.
-
----
-
-### 🔍 JWT Decoder / Inspector
-A diagnostic view built for real-time decoding, structural dissection, and signature confirmation of JSON Web Tokens without relying on online validation tools.
-
-<details>
-  <summary>📸 View JWT Decoder Interface</summary>
-
-  ![JWT Decoder](assets/jwt_decoder_tab.png)
-
-</details>
-
-* **Formatted Syntax Highlighting:** Decodes composite base64 strings into readable structured formats parsing structural components (Header information vs Claim payloads).
-* **Fixed-Time Verification:** Protects verification mechanisms from side-channel timing analysis vectors during HMAC validation sweeps (`HS256`, `HS384`, `HS512`).
-* **Temporal Normalization:** Instantly translates implicit Unix timestamps (`exp` claims) into system local time values while rendering persistent operational indicators.
-
----
-
-## Tech Stack & Architecture
-
-- **Language:** C#
-- **Platform:** .NET 10 / Windows Presentation Foundation (WPF)
-- **UI Design:** Material Design in XAML (v5.0+ Base Theme Layer)
-
-### Core Dependencies (NuGet)
-* `MaterialDesignThemes` — Modern component rendering & styling suite
-* `Konscious.Security.Cryptography.Argon2` — Argon2id implementation
-* `BCrypt.Net-Next` — Enhanced BCrypt core wrapper
-* `Otp.NET` — Standard-compliant RFC TOTP calculation engine
-* `ClosedXML` — Strict open XML spreadsheet creation logic
-* `System.Security.Cryptography` — Native cryptographic abstractions
-
----
-
-## 🧾 License
-
-This project is licensed under the MIT License.
+MIT. See [LICENSE.txt](LICENSE.txt). Third-party components are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
