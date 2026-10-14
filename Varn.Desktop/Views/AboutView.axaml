@@ -63,9 +63,17 @@
             <Border Classes="card">
                 <StackPanel Spacing="12">
                     <TextBlock Classes="label" Text="{loc:T About_Links}" />
-                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left"
-                                         Icon="{StaticResource IconOpen}" Text="{loc:T About_GitHub}"
-                                         Tag="{x:Static svc:AppInfo.GitHubUrl}" Click="Link_Click" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <controls:IconButton Classes="ghost"
+                                             Icon="{StaticResource IconOpen}" Text="{loc:T About_GitHub}"
+                                             Tag="{x:Static svc:AppInfo.GitHubUrl}" Click="Link_Click" />
+                        <controls:IconButton Classes="ghost"
+                                             Icon="{StaticResource IconOpen}" Text="{loc:T About_License}"
+                                             Tag="{x:Static svc:AppInfo.LicenseUrl}" Click="Link_Click" />
+                        <controls:IconButton Classes="ghost"
+                                             Icon="{StaticResource IconOpen}" Text="{loc:T About_Notices}"
+                                             Tag="{x:Static svc:AppInfo.ThirdPartyNoticesUrl}" Click="Link_Click" />
+                    </StackPanel>
                     <TextBlock Classes="muted" FontSize="11" Text="{loc:T About_Author}" />
                 </StackPanel>
             </Border>

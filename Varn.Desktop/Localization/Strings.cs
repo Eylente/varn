@@ -163,7 +163,9 @@ public static class Strings
         ["About_Links"] = "Project",
         ["About_GitHub"] = "GitHub",
         ["About_Author"] = "Made by Eylente",
-        ["About_P6"] = "• The only thing Varn saves to disk is your interface language (settings.json in your user profile folder)."
+        ["About_P6"] = "• The only thing Varn saves to disk is your interface language (settings.json in your user profile folder).",
+        ["About_License"] = "License (MIT)",
+        ["About_Notices"] = "Third-party licenses"
     };
 
     public static readonly Dictionary<string, string> Ru = new()
@@ -325,6 +327,8 @@ public static class Strings
         ["About_Links"] = "Проект",
         ["About_GitHub"] = "GitHub",
         ["About_Author"] = "Автор: Eylente",
-        ["About_P6"] = "• Единственное, что Varn сохраняет на диск, это язык интерфейса (файл settings.json в папке профиля пользователя)."
+        ["About_P6"] = "• Единственное, что Varn сохраняет на диск, это язык интерфейса (файл settings.json в папке профиля пользователя).",
+        ["About_License"] = "Лицензия (MIT)",
+        ["About_Notices"] = "Лицензии сторонних компонентов"
     };
 }

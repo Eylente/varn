@@ -5,6 +5,8 @@ namespace Varn.Desktop.Services;
 public static class AppInfo
 {
     public const string GitHubUrl = "https://github.com/Eylente/varn";
+    public const string LicenseUrl = "https://github.com/Eylente/varn/blob/main/LICENSE.txt";
+    public const string ThirdPartyNoticesUrl = "https://github.com/Eylente/varn/blob/main/THIRD-PARTY-NOTICES.md";
 
     public static string Version { get; } = ReadVersion();
 
