@@ -74,3 +74,7 @@ dotnet test
 ## License
 
 MIT. See [LICENSE.txt](LICENSE.txt). Third-party components are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+## Name and logo
+
+The source code is licensed under the MIT License. The name "Varn" and the Varn logo (`docs/icon.png` and the icon files in `Varn.Desktop/Assets/`) are © 2026 Eylente, all rights reserved, and are not covered by the MIT License. If you fork Varn or distribute a modified version, please use a different name and logo so it cannot be mistaken for the official builds.

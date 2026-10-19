@@ -9,3 +9,5 @@ riderModule.iml
 *.user
 .vs/
 .obsidian/
+artifacts/
+installer/
