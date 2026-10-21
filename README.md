@@ -36,7 +36,7 @@ Many everyday crypto tasks (hashing a test password, decoding a token, checking 
 
 ## Download
 
-Prebuilt binaries will appear on the [Releases](https://github.com/Eylente/varn/releases) page soon. Until then, build from source (see below).
+Download the latest Windows build from the [Releases](https://github.com/Eylente/varn/releases) page: an installer (no administrator rights needed) or a portable ZIP. Both are self-contained and do not require .NET to be installed. Always download Varn from this page only, and compare the SHA-256 checksums from the release notes. On Linux and macOS you can build from source (see below); these platforms have not been tested yet.
 
 ## Build from source
 

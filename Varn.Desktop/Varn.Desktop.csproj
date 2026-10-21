@@ -12,6 +12,19 @@
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
+	<Target Name="RemovePublishPdbs" AfterTargets="Publish">
+		<ItemGroup>
+			<PublishPdbs Include="$(PublishDir)**\*.pdb" />
+		</ItemGroup>
+		<Delete Files="@(PublishPdbs)" />
+	</Target>
+
+	<ItemGroup>
+		<None Include="..\LICENSE.txt" Link="LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
+		<None Include="..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToPublishDirectory="PreserveNewest" />
+		<None Include="..\licenses\**" Link="licenses\%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="12.1.0" />
         <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
