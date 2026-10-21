@@ -38,6 +38,10 @@ Many everyday crypto tasks (hashing a test password, decoding a token, checking 
 
 Download the latest Windows build from the [Releases](https://github.com/Eylente/varn/releases) page: an installer (no administrator rights needed) or a portable ZIP. Both are self-contained and do not require .NET to be installed. Always download Varn from this page only, and compare the SHA-256 checksums from the release notes. On Linux and macOS you can build from source (see below); these platforms have not been tested yet.
 
+### Code signing
+
+The Windows installer and executable are **not code-signed**. Because of this, Windows SmartScreen may warn about an unrecognized app, and installing for all users shows an administrator prompt with "Unknown publisher". This is expected. Installing for the current user only does not require administrator rights. To make sure you have the genuine file, download Varn only from the [Releases](https://github.com/Eylente/varn/releases) page of this repository and compare its SHA-256 checksum with the one in the release notes. You can also build Varn yourself from the source code.
+
 ## Build from source
 
 You need the [.NET 10 SDK](https://dotnet.microsoft.com/download).
@@ -70,6 +74,7 @@ dotnet test
 - Verify an existing hash against a password
 - Ed25519 keys
 - Tested Linux and macOS builds
+- Code signing for Windows builds
 
 ## License
 
