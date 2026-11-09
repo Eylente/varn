@@ -1,5 +1,5 @@
 # Changelog
-## [0.1.1] - YYYY-MM-DD
+## [0.1.1] - 2026-11-10
 ### Added
 - Hash verification page: check a password against an existing hash (Argon2id, Argon2i, Argon2d, scrypt and PBKDF2 in PHC format, bcrypt)
 - Settings page: interface language and resource limits (threads and share of memory)
