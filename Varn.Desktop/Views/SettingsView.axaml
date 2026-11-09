@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="700"
+             x:Class="Varn.Desktop.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+    <Design.DataContext>
+        <vm:SettingsViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="h1" Text="{loc:T Settings_Title}" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Settings_Subtitle}" />
+            </StackPanel>
+
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T Settings_Language}" />
+                    <RadioButton GroupName="language" Content="Русский" IsChecked="{Binding IsRussian}" />
+                    <RadioButton GroupName="language" Content="English" IsChecked="{Binding IsEnglish}" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Classes="label" Text="{loc:T Settings_Performance}" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{loc:T Settings_Threads}" />
+                        <TextBlock Grid.Column="1" Text="{Binding ThreadsText}" />
+                    </Grid>
+                    <Slider Minimum="1" Maximum="{Binding MaxThreadsLimit}" TickFrequency="1"
+                            IsSnapToTickEnabled="True" Value="{Binding MaxThreads}" />
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{Binding ThreadsHint}" />
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                        <TextBlock Text="{loc:T Settings_Memory}" />
+                        <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding MemoryText}" />
+                    </Grid>
+                    <Slider Minimum="10" Maximum="75" TickFrequency="5"
+                            IsSnapToTickEnabled="True" Value="{Binding MemoryPercent}" />
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{loc:T Settings_MemoryHint}" />
+
+                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left"
+                                         Icon="{StaticResource IconRefresh}" Text="{loc:T Settings_Reset}"
+                                         Command="{Binding ResetLimitsCommand}" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{loc:T Settings_Note}" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

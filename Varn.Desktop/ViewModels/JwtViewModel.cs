@@ -104,6 +104,8 @@ public partial class JwtViewModel : PageViewModel
 
     private void ApplyVerification(JwtVerificationResult result)
     {
+        string detail = CoreMessages.Translate(result.Code, result.Message, result.Arguments);
+
         switch (result.Status)
         {
             case JwtVerificationStatus.Valid:
@@ -119,13 +121,13 @@ public partial class JwtViewModel : PageViewModel
                 SetSignature(SigLevel.Bad, L("Jwt_SigNone"), string.Empty);
                 break;
             case JwtVerificationStatus.UnsupportedAlgorithm:
-                SetSignature(SigLevel.Warn, L("Jwt_SigUnsupported"), result.Message ?? string.Empty);
+                SetSignature(SigLevel.Warn, L("Jwt_SigUnsupported"), detail);
                 break;
             case JwtVerificationStatus.KeyInvalid:
-                SetSignature(SigLevel.Warn, L("Jwt_SigKeyInvalid"), result.Message ?? string.Empty);
+                SetSignature(SigLevel.Warn, L("Jwt_SigKeyInvalid"), detail);
                 break;
             default:
-                SetSignature(SigLevel.Bad, L("Jwt_Malformed"), result.Message ?? string.Empty);
+                SetSignature(SigLevel.Bad, L("Jwt_Malformed"), detail);
                 break;
         }
     }
@@ -236,12 +238,12 @@ public partial class JwtViewModel : PageViewModel
                 algorithm, GenKey, payload, keyId, GenSecretIsBase64, password);
 
             GeneratedToken = result.Token;
-            GenWarning = result.Warning ?? string.Empty;
+            GenWarning = CoreMessages.Translate(result.WarningCode, result.Warning, result.WarningArguments);
         }
         catch (Exception ex) when (ex is ArgumentException or FormatException or CryptographicException)
         {
             GeneratedToken = string.Empty;
-            GenError = ex.Message;
+            GenError = CoreMessages.FromException(ex);
         }
     }
 

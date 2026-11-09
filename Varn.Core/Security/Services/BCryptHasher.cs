@@ -36,6 +36,7 @@ public sealed class BCryptHasher : IPasswordHasher
             Algorithm: AlgorithmName,
             SaltEmbeddedInHash: true,
             ParametersJson: null,
-            Warning: warning);
+            Warning: warning,
+            WarningCode: warning is null ? null : MessageCodes.WarnBcryptTruncated);
     }
 }

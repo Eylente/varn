@@ -28,7 +28,8 @@ public sealed record PasswordHashResult(
     string Algorithm,
     bool SaltEmbeddedInHash,
     string? ParametersJson = null,
-    string? Warning = null);
+    string? Warning = null,
+    string? WarningCode = null);
 
 /// <summary>Значения по умолчанию: RFC 9106 §4, вариант с меньшей памятью (t=3, m=64 MiB, p=4).</summary>
 public sealed record Argon2Options(int Iterations = 3, int MemoryKb = 65536, int Parallelism = 4);

@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Varn.Core.Security.Models;
 using Varn.Core.Security.Services;
 using Varn.Desktop.Localization;
+using Varn.Core.Services;
+using Varn.Desktop.Services;
 
 namespace Varn.Desktop.ViewModels;
 
@@ -87,6 +89,13 @@ public partial class HashViewModel : PageViewModel
         {
             PasswordAlgorithm algorithm = Settings.SelectedAlgorithm;
             HasherSettings settings = Settings.BuildSettings();
+            long needed = BatchHasher.EstimateMemoryPerHashBytes(algorithm, settings);
+            long allowed = (long)(BatchHasher.AvailableMemoryBytes() * SettingsService.GetResourceLimits().MemoryFraction);
+            if (needed > allowed)
+            {
+                ErrorMessage = string.Format(Loc.Instance["Hash_ErrMemory"], needed / (1024 * 1024), allowed / (1024 * 1024));
+                return;
+            }
             string password = Password;
 
             PasswordHashResult result = await Task.Run(
@@ -97,7 +106,7 @@ public partial class HashViewModel : PageViewModel
             ResultParameters = result.ParametersJson ?? string.Empty;
             ResultAlgorithm = result.Algorithm;
             SaltEmbedded = result.SaltEmbeddedInHash;
-            Warning = result.Warning ?? string.Empty;
+            Warning = CoreMessages.Translate(result.WarningCode, result.Warning);
         }
         catch (Exception ex)
         {

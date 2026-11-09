@@ -15,16 +15,32 @@ public sealed class BatchHasher
             _ => 1024 * 1024
         };
 
-    /// <summary>Не больше числа ядер и не больше половины доступной процессу памяти.</summary>
-    public static int RecommendedParallelism(long memoryPerHashBytes)
-    {
-        int cpu = Environment.ProcessorCount;
-        if (memoryPerHashBytes <= 0) return cpu;
+    /// <summary>Память, которую процесс вообще может использовать (физическая или лимит контейнера).</summary>
+    public static long AvailableMemoryBytes() => GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
 
-        long budget = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 2;
-        long byMemory = budget / memoryPerHashBytes;
-        return (int)Math.Clamp(byMemory, 1, cpu);
+    /// <summary>Сколько потоков использует один хэш внутри: у Argon2 это параметр параллелизма.</summary>
+    public static int EstimateInternalThreads(PasswordAlgorithm algorithm, HasherSettings settings) =>
+        algorithm == PasswordAlgorithm.Argon2id ? Math.Max(1, settings.Argon2.Parallelism) : 1;
+
+    /// <summary>Сколько хэшей считать одновременно, не выходя за лимиты потоков и памяти (минимум один).</summary>
+    public static int RecommendedParallelism(long memoryPerHashBytes, int internalThreads, ResourceLimits limits)
+    {
+        ArgumentNullException.ThrowIfNull(limits);
+
+        limits = limits.Normalized();
+        internalThreads = Math.Max(1, internalThreads);
+
+        int byThreads = Math.Max(1, limits.MaxThreads / internalThreads);
+
+        long budget = (long)(AvailableMemoryBytes() * limits.MemoryFraction);
+        long byMemory = memoryPerHashBytes <= 0 ? int.MaxValue : Math.Max(1, budget / memoryPerHashBytes);
+
+        return (int)Math.Min(byThreads, byMemory);
     }
+
+    /// <summary>Короткая форма с лимитами по умолчанию.</summary>
+    public static int RecommendedParallelism(long memoryPerHashBytes) =>
+        RecommendedParallelism(memoryPerHashBytes, 1, ResourceLimits.Default);
 
     public IReadOnlyList<UserOutput> HashAll(
         IReadOnlyList<UserInput> users,

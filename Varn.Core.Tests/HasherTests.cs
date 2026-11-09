@@ -152,4 +152,12 @@ public class HasherTests
     [Fact]
     public void BCrypt_WorkFactorOutOfRange_Throws() =>
         Assert.Throws<ArgumentOutOfRangeException>(() => new BCryptHasher(3));
+    
+    [Fact]
+    public void BCrypt_LongPassword_WarningHasCode()
+    {
+        var result = PasswordHasherFactory.Create(PasswordAlgorithm.BCrypt, Fast).Hash(new string('a', 80));
+
+        Assert.Equal(MessageCodes.WarnBcryptTruncated, result.WarningCode);
+    }
 }

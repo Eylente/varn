@@ -13,10 +13,12 @@ public partial class MainViewModel : ViewModelBase
         Pages =
         [
             new HashViewModel(hashSettings),
+            new VerifyViewModel(),
             new ExcelViewModel(hashSettings),
             new KeysViewModel(),
             new JwtViewModel(),
             new TotpViewModel(),
+            new SettingsViewModel(),
             new AboutViewModel()
         ];
         SelectedPage = Pages[0];

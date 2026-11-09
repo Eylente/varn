@@ -241,4 +241,39 @@ public class JwtTests
         Assert.True(JwtVerifier.Verify(token, LongSecret).IsValid);
         Assert.True(JwtVerifier.Verify(token, base64Secret, secretIsBase64: true).IsValid);
     }
+    
+    [Fact]
+    public void Verify_Messages_CarryCodesAndArguments()
+    {
+        var hmacToken = JwtGenerator.Generate(JwtAlgorithm.HS256, LongSecret, Payload).Token;
+        var confusion = JwtVerifier.Verify(hmacToken, Rsa.Value.PublicKeyPem);
+        Assert.Equal(MessageCodes.HmacWithPemKey, confusion.Code);
+
+        var esToken = JwtGenerator.Generate(JwtAlgorithm.ES256, P256.Value.PrivateKeyPem, Payload).Token;
+        var mismatch = JwtVerifier.Verify(esToken, P384.Value.PublicKeyPem);
+        Assert.Equal(MessageCodes.EcCurveMismatch, mismatch.Code);
+        Assert.Equal(new[] { "ES256", "256", "384" }, mismatch.Arguments!.ToArray());
+
+        var unsupported = JwtVerifier.Verify($"{B64("{\"alg\":\"HS999\"}")}.{B64(Payload)}.AAAA", "secret");
+        Assert.Equal(MessageCodes.UnsupportedAlgorithm, unsupported.Code);
+        Assert.Equal(new[] { "HS999" }, unsupported.Arguments!.ToArray());
+    }
+
+    [Fact]
+    public void Generate_Errors_CarryCodes()
+    {
+        var ex = Assert.Throws<ArgumentException>(
+            () => JwtGenerator.Generate(JwtAlgorithm.HS256, Rsa.Value.PrivateKeyPem, Payload));
+
+        Assert.Equal(MessageCodes.HmacWithPemKey, ex.Data["code"]);
+    }
+
+    [Fact]
+    public void Generate_ShortSecret_WarningCarriesCodeAndArguments()
+    {
+        var result = JwtGenerator.Generate(JwtAlgorithm.HS256, "short", Payload);
+
+        Assert.Equal(MessageCodes.WarnHmacSecretShort, result.WarningCode);
+        Assert.Equal(new[] { "40", "256", "HS256" }, result.WarningArguments!.ToArray());
+    }
 }

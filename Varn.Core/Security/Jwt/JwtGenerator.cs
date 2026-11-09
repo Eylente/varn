@@ -4,12 +4,14 @@ using System.Text.Json;
 
 namespace Varn.Core.Security.Jwt;
 
-public sealed record JwtGenerationResult(string Token, string? Warning);
+public sealed record JwtGenerationResult(
+    string Token,
+    string? Warning,
+    string? WarningCode = null,
+    IReadOnlyList<string>? WarningArguments = null);
 
 public static class JwtGenerator
 {
-    /// <param name="key">HS*: общий секрет; RS*/PS*/ES*: приватный ключ в PEM (PKCS#8 или шифрованный PKCS#8).</param>
-    /// <param name="payloadJson">JSON-объект с claims.</param>
     public static JwtGenerationResult Generate(
         JwtAlgorithm algorithm,
         string key,
@@ -30,7 +32,11 @@ public static class JwtGenerator
         var (signature, warning) = Sign(
             algorithm, Encoding.ASCII.GetBytes(signingInput), key, secretIsBase64, privateKeyPassword);
 
-        return new JwtGenerationResult($"{signingInput}.{JwtBase64Url.Encode(signature)}", warning);
+        return new JwtGenerationResult(
+            $"{signingInput}.{JwtBase64Url.Encode(signature)}",
+            warning?.Message,
+            warning?.Code,
+            warning?.Arguments);
     }
 
     private static string BuildHeader(JwtAlgorithm algorithm, string? keyId)
@@ -52,17 +58,21 @@ public static class JwtGenerator
         {
             using var doc = JsonDocument.Parse(payloadJson);
             if (doc.RootElement.ValueKind != JsonValueKind.Object)
-                throw new ArgumentException("The payload must be a JSON object.", nameof(payloadJson));
+            {
+                throw Error("The payload must be a JSON object.", nameof(payloadJson),
+                    MessageCodes.PayloadNotObject);
+            }
 
             return JsonSerializer.Serialize(doc.RootElement);
         }
         catch (JsonException ex)
         {
-            throw new ArgumentException($"The payload is not valid JSON: {ex.Message}", nameof(payloadJson), ex);
+            throw Error($"The payload is not valid JSON: {ex.Message}", nameof(payloadJson),
+                MessageCodes.PayloadInvalidJson, ex, ex.Message);
         }
     }
 
-    private static (byte[] Signature, string? Warning) Sign(
+    private static (byte[] Signature, CoreWarning? Warning) Sign(
         JwtAlgorithm algorithm, byte[] data, string key, bool secretIsBase64, string? privateKeyPassword)
     {
         if (algorithm.IsHmac()) return SignHmac(algorithm, data, key, secretIsBase64);
@@ -70,11 +80,14 @@ public static class JwtGenerator
         return SignRsa(algorithm, data, key, privateKeyPassword);
     }
 
-    private static (byte[] Signature, string? Warning) SignHmac(
+    private static (byte[] Signature, CoreWarning? Warning) SignHmac(
         JwtAlgorithm algorithm, byte[] data, string key, bool secretIsBase64)
     {
         if (key.Contains("-----BEGIN", StringComparison.Ordinal))
-            throw new ArgumentException("HMAC algorithms need a shared secret, not a PEM key.", nameof(key));
+        {
+            throw Error("HMAC algorithms need a shared secret, not a PEM key.", nameof(key),
+                MessageCodes.HmacWithPemKey);
+        }
 
         byte[] secret;
         try
@@ -83,14 +96,17 @@ public static class JwtGenerator
         }
         catch (FormatException ex)
         {
-            throw new ArgumentException("The secret is not valid Base64.", nameof(key), ex);
+            throw Error("The secret is not valid Base64.", nameof(key), MessageCodes.SecretNotBase64, ex);
         }
 
         try
         {
             int minBytes = algorithm.HashSizeBytes();
-            string? warning = secret.Length < minBytes
-                ? $"The secret is {secret.Length * 8} bits; RFC 7518 requires at least {minBytes * 8} bits for {algorithm}."
+            CoreWarning? warning = secret.Length < minBytes
+                ? new CoreWarning(
+                    $"The secret is {secret.Length * 8} bits; RFC 7518 requires at least {minBytes * 8} bits for {algorithm}.",
+                    MessageCodes.WarnHmacSecretShort,
+                    [(secret.Length * 8).ToString(), (minBytes * 8).ToString(), algorithm.ToString()])
                 : null;
 
             using HMAC hmac = algorithm.CreateHmac(secret);
@@ -102,7 +118,7 @@ public static class JwtGenerator
         }
     }
 
-    private static (byte[] Signature, string? Warning) SignRsa(
+    private static (byte[] Signature, CoreWarning? Warning) SignRsa(
         JwtAlgorithm algorithm, byte[] data, string key, string? password)
     {
         using var rsa = RSA.Create();
@@ -113,13 +129,16 @@ public static class JwtGenerator
         }
         catch (Exception ex) when (ex is ArgumentException or CryptographicException)
         {
-            throw new ArgumentException(
+            throw Error(
                 "Could not read the RSA private key. Expected PEM (PKCS#8); if it is encrypted, supply the password.",
-                nameof(key), ex);
+                nameof(key), MessageCodes.RsaPrivateKeyUnreadable, ex);
         }
 
-        string? warning = rsa.KeySize < 2048
-            ? $"The RSA key is {rsa.KeySize} bits; RFC 7518 requires at least 2048 bits."
+        CoreWarning? warning = rsa.KeySize < 2048
+            ? new CoreWarning(
+                $"The RSA key is {rsa.KeySize} bits; RFC 7518 requires at least 2048 bits.",
+                MessageCodes.WarnRsaKeyShort,
+                [rsa.KeySize.ToString()])
             : null;
 
         var padding = algorithm.IsRsaPss() ? RSASignaturePadding.Pss : RSASignaturePadding.Pkcs1;
@@ -130,11 +149,12 @@ public static class JwtGenerator
         }
         catch (CryptographicException ex)
         {
-            throw new ArgumentException("Signing failed: the key may contain only the public part.", nameof(key), ex);
+            throw Error("Signing failed: the key may contain only the public part.", nameof(key),
+                MessageCodes.KeyHasNoPrivatePart, ex);
         }
     }
 
-    private static (byte[] Signature, string? Warning) SignEcdsa(
+    private static (byte[] Signature, CoreWarning? Warning) SignEcdsa(
         JwtAlgorithm algorithm, byte[] data, string key, string? password)
     {
         using var ecdsa = ECDsa.Create();
@@ -145,17 +165,18 @@ public static class JwtGenerator
         }
         catch (Exception ex) when (ex is ArgumentException or CryptographicException)
         {
-            throw new ArgumentException(
+            throw Error(
                 "Could not read the EC private key. Expected PEM (PKCS#8); if it is encrypted, supply the password.",
-                nameof(key), ex);
+                nameof(key), MessageCodes.EcPrivateKeyUnreadable, ex);
         }
 
         int expectedSize = algorithm.EcdsaKeySize();
         if (ecdsa.KeySize != expectedSize)
         {
-            throw new ArgumentException(
+            throw Error(
                 $"{algorithm} requires a P-{expectedSize} key, but the supplied key is {ecdsa.KeySize} bits.",
-                nameof(key));
+                nameof(key), MessageCodes.EcCurveMismatch, null,
+                algorithm.ToString(), expectedSize.ToString(), ecdsa.KeySize.ToString());
         }
 
         try
@@ -164,7 +185,21 @@ public static class JwtGenerator
         }
         catch (CryptographicException ex)
         {
-            throw new ArgumentException("Signing failed: the key may contain only the public part.", nameof(key), ex);
+            throw Error("Signing failed: the key may contain only the public part.", nameof(key),
+                MessageCodes.KeyHasNoPrivatePart, ex);
         }
+    }
+    
+    private static ArgumentException Error(
+        string message, string paramName, string code, Exception? inner = null, params string[] arguments)
+    {
+        var exception = new ArgumentException(message, paramName, inner);
+        exception.Data["code"] = code;
+        for (int i = 0; i < arguments.Length; i++)
+        {
+            exception.Data[$"arg{i}"] = arguments[i];
+        }
+
+        return exception;
     }
 }

@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Varn.Desktop.ViewModels"
+             xmlns:controls="using:Varn.Desktop.Controls"
+             xmlns:loc="using:Varn.Desktop.Localization"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="800"
+             x:Class="Varn.Desktop.Views.VerifyView"
+             x:DataType="vm:VerifyViewModel">
+    <Design.DataContext>
+        <vm:VerifyViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Spacing="18" Margin="36" MaxWidth="860">
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="h1" Text="{loc:T Verify_Title}" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="{loc:T Verify_Subtitle}" />
+            </StackPanel>
+
+            <Border Classes="card">
+                <StackPanel Spacing="14">
+                    <TextBlock Classes="label" Text="{loc:T Hash_Hash}" />
+                    <TextBox Classes="mono" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"
+                             Text="{Binding Hash}" />
+                    <controls:IconButton Classes="ghost" HorizontalAlignment="Left"
+                                         Icon="{StaticResource IconPaste}" Text="{loc:T Verify_Paste}"
+                                         Click="Paste_Click" />
+                    <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="{loc:T Verify_Supported}" />
+
+                    <TextBlock Classes="label" Margin="0,8,0,0" Text="{loc:T Hash_Password}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Classes="mono"
+                                 Text="{Binding Password}"
+                                 PasswordChar="{Binding PasswordChar}">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter" Command="{Binding VerifyCommand}" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                        <ToggleButton Grid.Column="1" Margin="8,0,0,0"
+                                      IsChecked="{Binding RevealPassword}"
+                                      ToolTip.Tip="{loc:T Hash_Show}">
+                            <Panel>
+                                <PathIcon Width="18" Height="18" Data="{StaticResource IconEye}"
+                                          IsVisible="{Binding !RevealPassword}" />
+                                <PathIcon Width="18" Height="18" Data="{StaticResource IconEyeOff}"
+                                          IsVisible="{Binding RevealPassword}" />
+                            </Panel>
+                        </ToggleButton>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <controls:IconButton Classes="primary"
+                                     Icon="{StaticResource IconCheck}" Text="{loc:T Verify_Run}"
+                                     Command="{Binding VerifyCommand}" />
+                <controls:IconButton Classes="ghost"
+                                     Icon="{StaticResource IconClear}" Text="{loc:T Hash_Clear}"
+                                     Command="{Binding ClearCommand}" />
+            </StackPanel>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+            <TextBlock Classes="error" TextWrapping="Wrap" IsVisible="{Binding HasError}"
+                       Text="{Binding ErrorMessage}" />
+
+            <Border Classes="status"
+                    Classes.ok="{Binding ResultOk}"
+                    Classes.bad="{Binding ResultBad}"
+                    Classes.warn="{Binding ResultWarn}"
+                    IsVisible="{Binding HasResult}">
+                <StackPanel Spacing="6">
+                    <TextBlock FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding ResultHeadline}" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasDetail}"
+                               Text="{Binding ResultDetail}" />
+                    <TextBlock Classes="warn" TextWrapping="Wrap" IsVisible="{Binding ShowBcryptNote}"
+                               Text="{loc:T Verify_BcryptNote}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -16,25 +16,25 @@ public enum JwtVerificationStatus
     KeyInvalid
 }
 
-public sealed record JwtVerificationResult(JwtVerificationStatus Status, string? Message = null)
+public sealed record JwtVerificationResult(
+    JwtVerificationStatus Status,
+    string? Message = null,
+    string? Code = null,
+    IReadOnlyList<string>? Arguments = null)
 {
     public bool IsValid => Status == Valid;
 }
 
 public static class JwtVerifier
 {
-    /// <summary>
-    /// Для HS* ключ — общий секрет, для RS*/PS*/ES* — публичный (или приватный) ключ в PEM.
-    /// Алгоритм берётся из заголовка токена, но неизвестные алгоритмы никогда не сводятся к HS256.
-    /// </summary>
     public static JwtVerificationResult Verify(string? token, string? key, bool secretIsBase64 = false)
     {
         if (string.IsNullOrWhiteSpace(token))
-            return Result(MalformedToken, "The token is empty.");
+            return Result(MalformedToken, "The token is empty.", MessageCodes.TokenEmpty);
 
         string[] parts = token.Trim().Split('.');
         if (parts.Length != 3)
-            return Result(MalformedToken, "A signed JWT must have exactly three parts.");
+            return Result(MalformedToken, "A signed JWT must have exactly three parts.", MessageCodes.TokenNotThreeParts);
 
         string algName;
         try
@@ -43,17 +43,20 @@ public static class JwtVerifier
         }
         catch (Exception ex) when (ex is FormatException or JsonException)
         {
-            return Result(MalformedToken, "The header is not valid Base64Url-encoded JSON.");
+            return Result(MalformedToken, "The header is not valid Base64Url-encoded JSON.", MessageCodes.HeaderInvalid);
         }
 
         if (algName.Length == 0)
-            return Result(MalformedToken, "The header has no 'alg' field.");
+            return Result(MalformedToken, "The header has no 'alg' field.", MessageCodes.HeaderNoAlg);
 
         if (string.Equals(algName, "none", StringComparison.OrdinalIgnoreCase))
             return Result(AlgorithmNone, "alg is 'none': the token is unsigned and must never be trusted.");
 
         if (!JwtAlgorithmExtensions.TryParse(algName, out var algorithm))
-            return Result(UnsupportedAlgorithm, $"Algorithm '{algName}' is not supported.");
+        {
+            return Result(UnsupportedAlgorithm, $"Algorithm '{algName}' is not supported.",
+                MessageCodes.UnsupportedAlgorithm, algName);
+        }
 
         if (string.IsNullOrEmpty(key))
             return Result(KeyMissing, "Provide a key to verify the signature.");
@@ -65,7 +68,7 @@ public static class JwtVerifier
         }
         catch (FormatException)
         {
-            return Result(MalformedToken, "The signature is not valid Base64Url.");
+            return Result(MalformedToken, "The signature is not valid Base64Url.", MessageCodes.SignatureNotBase64);
         }
 
         byte[] data = Encoding.ASCII.GetBytes($"{parts[0]}.{parts[1]}");
@@ -82,7 +85,8 @@ public static class JwtVerifier
         {
             return Result(KeyInvalid,
                 "The token uses an HMAC algorithm but a PEM key was supplied. Using a public key as an HMAC " +
-                "secret is the classic algorithm-confusion attack; supply the shared secret instead.");
+                "secret is the classic algorithm-confusion attack; supply the shared secret instead.",
+                MessageCodes.HmacWithPemKey);
         }
 
         byte[] secret;
@@ -92,7 +96,7 @@ public static class JwtVerifier
         }
         catch (FormatException)
         {
-            return Result(KeyInvalid, "The secret is not valid Base64.");
+            return Result(KeyInvalid, "The secret is not valid Base64.", MessageCodes.SecretNotBase64);
         }
 
         try
@@ -119,7 +123,9 @@ public static class JwtVerifier
         }
         catch (Exception ex) when (ex is ArgumentException or CryptographicException)
         {
-            return Result(KeyInvalid, $"{algorithm} needs an RSA key in PEM format (PUBLIC KEY or PRIVATE KEY).");
+            return Result(KeyInvalid,
+                $"{algorithm} needs an RSA key in PEM format (PUBLIC KEY or PRIVATE KEY).",
+                MessageCodes.RsaKeyNotPem, algorithm.ToString());
         }
 
         var padding = algorithm.IsRsaPss() ? RSASignaturePadding.Pss : RSASignaturePadding.Pkcs1;
@@ -146,14 +152,18 @@ public static class JwtVerifier
         }
         catch (Exception ex) when (ex is ArgumentException or CryptographicException)
         {
-            return Result(KeyInvalid, $"{algorithm} needs an EC key in PEM format (PUBLIC KEY or PRIVATE KEY).");
+            return Result(KeyInvalid,
+                $"{algorithm} needs an EC key in PEM format (PUBLIC KEY or PRIVATE KEY).",
+                MessageCodes.EcKeyNotPem, algorithm.ToString());
         }
 
         int expectedSize = algorithm.EcdsaKeySize();
         if (ecdsa.KeySize != expectedSize)
         {
             return Result(KeyInvalid,
-                $"{algorithm} requires a P-{expectedSize} key, but the supplied key is {ecdsa.KeySize} bits.");
+                $"{algorithm} requires a P-{expectedSize} key, but the supplied key is {ecdsa.KeySize} bits.",
+                MessageCodes.EcCurveMismatch,
+                algorithm.ToString(), expectedSize.ToString(), ecdsa.KeySize.ToString());
         }
 
         try
@@ -180,6 +190,10 @@ public static class JwtVerifier
             : string.Empty;
     }
 
-    private static JwtVerificationResult Result(JwtVerificationStatus status, string? message = null) =>
-        new(status, message);
+    private static JwtVerificationResult Result(
+        JwtVerificationStatus status,
+        string? message = null,
+        string? code = null,
+        params string[] arguments) =>
+        new(status, message, code, arguments.Length == 0 ? null : arguments);
 }

@@ -20,6 +20,8 @@ Many everyday crypto tasks (hashing a test password, decoding a token, checking 
 ## Features
 
 - **Password hashing**: Argon2id, bcrypt, PBKDF2 (SHA-256/512) and scrypt, with sensible defaults (Argon2id t=3, 64 MiB, p=4; PBKDF2 600,000 iterations; bcrypt cost 12; scrypt N=2^16). Output as a PHC string or as separate hash, salt and parameters. Legacy SHA-256, MD5 and SHA-1 are available only to emulate old systems.
+- **Hash verification**: check a password against an existing hash (PHC strings for Argon2, scrypt and PBKDF2, and bcrypt). The algorithm and its parameters are read from the hash itself, and hashes with extreme parameters are rejected before any computation.
+- **Resource limits**: choose how many threads and how much memory batch hashing may use (half of the threads and a quarter of the memory by default).
 - **Batch hashing from Excel**: hash a whole column of passwords (`Login`, `Password`) and get hash, salt, algorithm, parameters and notes back. Parallelism is limited by available memory, and the run can be cancelled.
 - **Keys**: random secrets (128/256/512 bit as Base64, Hex or Base32) and RSA (2048/3072/4096) or ECDSA (P-256/384/521) key pairs. Export as PEM (PKCS#8 and SPKI) or JWK, optionally with an AES-256 encrypted private key.
 - **JWT**: decode and verify HS256/384/512, RS256/384/512, PS256/384/512 and ES256/384/512, or create signed tokens. Warns about `alg: none`, algorithm-confusion keys and weak secrets, and shows `iat`, `nbf` and `exp` with their status.
@@ -28,11 +30,24 @@ Many everyday crypto tasks (hashing a test password, decoding a token, checking 
 
 ## Screenshots
 
-![Password hashing](docs/screenshots/hash.png)
-![Excel batch](docs/screenshots/excel.png)
-![Keys](docs/screenshots/keys.png)
-![JWT](docs/screenshots/jwt.png)
-![TOTP](docs/screenshots/totp.png)
+<table>
+  <tr>
+    <td><img src="docs/screenshots/hash.png" alt="Password hashing"></td>
+    <td><img src="docs/screenshots/verify.png" alt="Hash verification"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/excel.png" alt="Excel batch"></td>
+    <td><img src="docs/screenshots/jwt.png" alt="JWT"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/keys.png" alt="Keys"></td>
+    <td><img src="docs/screenshots/key-pair.png" alt="Key pair (RSA / ECDSA)"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/totp.png" alt="TOTP"></td>
+    <td><img src="docs/screenshots/settings.png" alt="Settings"></td>
+  </tr>
+</table>
 
 ## Download
 
@@ -63,7 +78,7 @@ dotnet test
 
 ## Security notes and limitations
 
-- Varn works fully offline. The only thing it saves to disk is the interface language (`settings.json` in your user profile).
+- Varn works fully offline. The only thing it saves to disk is your settings: the interface language and resource limits (settings.json in your user profile).
 - Varn has **not been independently audited**. It is a tool for development and diagnostics, so do not use it to create secrets that protect real systems.
 - Cryptography comes from well-known libraries (.NET, Konscious.Security.Cryptography for Argon2, BCrypt.Net-Next, BouncyCastle for scrypt, Otp.NET), not from custom implementations.
 - Passwords and secrets are entered as .NET strings, which cannot be wiped from memory. Varn wipes the byte buffers it creates itself and clears copied values from the clipboard after 30 seconds. This does not protect against someone who can read your computer's memory, and clipboard managers (such as Windows clipboard history) keep their own copies.
@@ -71,7 +86,6 @@ dotnet test
 
 ## Ideas for later
 
-- Verify an existing hash against a password
 - Ed25519 keys
 - Tested Linux and macOS builds
 - Code signing for Windows builds

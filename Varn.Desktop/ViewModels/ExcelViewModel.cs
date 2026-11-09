@@ -8,6 +8,7 @@ using Varn.Core.Security.Models;
 using Varn.Core.Security.Services;
 using Varn.Core.Services;
 using Varn.Desktop.Localization;
+using Varn.Desktop.Services;
 
 namespace Varn.Desktop.ViewModels;
 
@@ -119,7 +120,9 @@ public partial class ExcelViewModel : PageViewModel
                 var users = _excel.ReadEmployees(input);
                 var hasher = PasswordHasherFactory.Create(algorithm, settings);
                 int threads = BatchHasher.RecommendedParallelism(
-                    BatchHasher.EstimateMemoryPerHashBytes(algorithm, settings));
+                    BatchHasher.EstimateMemoryPerHashBytes(algorithm, settings),
+                    BatchHasher.EstimateInternalThreads(algorithm, settings),
+                    SettingsService.GetResourceLimits());
 
                 var results = _batch.HashAll(users, hasher, threads, progress, token);
                 _excel.SaveResults(outputPath, results);

@@ -52,4 +52,50 @@ public class BatchHasherTests
         Assert.Equal(1, huge);
         Assert.InRange(tiny, 1, Environment.ProcessorCount);
     }
+    
+    [Fact]
+    public void RecommendedParallelism_RespectsThreadLimit()
+    {
+        var limits = new ResourceLimits(MaxThreads: 2, MemoryFraction: 0.5);
+
+        int result = BatchHasher.RecommendedParallelism(1, 1, limits);
+
+        Assert.InRange(result, 1, Math.Min(2, Environment.ProcessorCount));
+    }
+
+    [Fact]
+    public void RecommendedParallelism_CountsInternalThreads()
+    {
+        var limits = new ResourceLimits(MaxThreads: Environment.ProcessorCount, MemoryFraction: 0.9);
+
+        int result = BatchHasher.RecommendedParallelism(1, internalThreads: 4, limits);
+
+        Assert.True(result <= Math.Max(1, Environment.ProcessorCount / 4));
+        Assert.True(result >= 1);
+    }
+
+    [Fact]
+    public void RecommendedParallelism_HugeMemoryPerHash_ReturnsOne() =>
+        Assert.Equal(1, BatchHasher.RecommendedParallelism(long.MaxValue / 2, 1, ResourceLimits.Default));
+
+    [Fact]
+    public void ResourceLimits_Normalized_ClampsValues()
+    {
+        var low = new ResourceLimits(0, -1).Normalized();
+        var high = new ResourceLimits(100_000, 5).Normalized();
+
+        Assert.Equal(1, low.MaxThreads);
+        Assert.Equal(0.05, low.MemoryFraction);
+        Assert.Equal(Environment.ProcessorCount, high.MaxThreads);
+        Assert.Equal(0.9, high.MemoryFraction);
+    }
+
+    [Fact]
+    public void ResourceLimits_Default_IsHalfOfThreads()
+    {
+        var limits = ResourceLimits.Default;
+
+        Assert.Equal(Math.Max(1, Environment.ProcessorCount / 2), limits.MaxThreads);
+        Assert.Equal(0.25, limits.MemoryFraction);
+    }
 }
