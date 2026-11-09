@@ -32,20 +32,20 @@ Many everyday crypto tasks (hashing a test password, decoding a token, checking 
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/hash.png" alt="Password hashing"></td>
-    <td><img src="docs/screenshots/verify.png" alt="Hash verification"></td>
+    <td width="50%"><img src="docs/screenshots/hash.png" alt="Password hashing" width="100%"></td>
+    <td width="50%"><img src="docs/screenshots/verify.png" alt="Hash verification" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/excel.png" alt="Excel batch"></td>
-    <td><img src="docs/screenshots/jwt.png" alt="JWT"></td>
+    <td><img src="docs/screenshots/excel.png" alt="Excel batch" width="100%"></td>
+    <td><img src="docs/screenshots/jwt.png" alt="JWT" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/keys.png" alt="Keys"></td>
-    <td><img src="docs/screenshots/key-pair.png" alt="Key pair (RSA / ECDSA)"></td>
+    <td><img src="docs/screenshots/keys.png" alt="Keys" width="100%"></td>
+    <td><img src="docs/screenshots/key-pair.png" alt="Key pair (RSA / ECDSA)" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/totp.png" alt="TOTP"></td>
-    <td><img src="docs/screenshots/settings.png" alt="Settings"></td>
+    <td><img src="docs/screenshots/totp.png" alt="TOTP" width="100%"></td>
+    <td><img src="docs/screenshots/settings.png" alt="Settings" width="100%"></td>
   </tr>
 </table>
 

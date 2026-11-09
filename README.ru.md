@@ -32,20 +32,20 @@
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/hash.png" alt="Хэширование паролей"></td>
-    <td><img src="docs/screenshots/verify.png" alt="Проверка хеша"></td>
+    <td width="50%"><img src="docs/screenshots/hash.png" alt="Хэширование паролей" width="100%"></td>
+    <td width="50%"><img src="docs/screenshots/verify.png" alt="Проверка хеша" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/excel.png" alt="Пакет из Excel"></td>
-    <td><img src="docs/screenshots/jwt.png" alt="JWT"></td>
+    <td><img src="docs/screenshots/excel.png" alt="Пакет из Excel" width="100%"></td>
+    <td><img src="docs/screenshots/jwt.png" alt="JWT" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/keys.png" alt="Ключи"></td>
-    <td><img src="docs/screenshots/key-pair.png" alt="Пара ключей (RSA / ECDSA)"></td>
+    <td><img src="docs/screenshots/keys.png" alt="Ключи" width="100%"></td>
+    <td><img src="docs/screenshots/key-pair.png" alt="Пара ключей (RSA / ECDSA)" width="100%"></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/totp.png" alt="TOTP"></td>
-    <td><img src="docs/screenshots/settings.png" alt="Настройки"></td>
+    <td><img src="docs/screenshots/totp.png" alt="TOTP" width="100%"></td>
+    <td><img src="docs/screenshots/settings.png" alt="Настройки" width="100%"></td>
   </tr>
 </table>
 
